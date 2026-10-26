@@ -1,5 +1,6 @@
-# Version: 1.0.1
-# Built with GitHub Actionsimport os
+# Version: 2.0.0
+# Built and deployed with GitHub Actions + AWS Systems Manager
+import os
 
 import re
 import csv
@@ -11,6 +12,9 @@ import tempfile
 
 app = Flask(__name__)
 CORS(app)
+
+APP_VERSION = '2.0.0'
+DEPLOYMENT_METHOD = 'GitHub Actions + AWS Systems Manager'
 
 # Global variables for playlist management
 current_directory = None
@@ -146,7 +150,29 @@ def index():
     """
     Renders the main HTML page for the client-side audio player.
     """
-    return render_template('index.html') 
+    # Preserve the existing player interface and show a visible deployment marker.
+    html = render_template('index.html')
+    banner = (
+        '<div id="deployment-version" style="position:fixed;bottom:12px;right:12px;'
+        'z-index:9999;background:#123b63;color:white;padding:10px 14px;'
+        'border-radius:8px;font:13px Arial,sans-serif;'
+        'box-shadow:0 2px 10px #0003">'
+        'CS6620 | Version 2.0.0 | GitHub Actions + AWS SSM</div>'
+    )
+    if '</body>' in html:
+        return html.replace('</body>', banner + '</body>', 1)
+    return html + banner
+
+
+@app.route('/deployment-info', methods=['GET'])
+def deployment_info():
+    """Expose the version used to verify CI/CD deployment."""
+    return jsonify({
+        'application': 'CS6620 Audio Player',
+        'version': APP_VERSION,
+        'deployment': DEPLOYMENT_METHOD,
+        'status': 'running'
+    })
 
 @app.route('/select_directory', methods=['POST'])
 def select_directory():
