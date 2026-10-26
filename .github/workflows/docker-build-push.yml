@@ -69,7 +69,7 @@ jobs:
               f'docker pull {os.environ["IMAGE"]}',
               'docker stop cs6620-app || true',
               'docker rm cs6620-app || true',
-              f'docker run -d --name cs6620-app --restart unless-stopped -p 80:5000 {os.environ["IMAGE"]}',
+              f'docker run -d --name cs6620-app --restart unless-stopped -p 80:3000 {os.environ["IMAGE"]}',
           ]
           with open('/tmp/ssm-params.json', 'w') as f:
               json.dump({'commands': commands}, f)
